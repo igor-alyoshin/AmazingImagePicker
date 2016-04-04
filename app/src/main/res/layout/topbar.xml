@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="60dp"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/header_background_color"
+    android:minHeight="?attr/actionBarSize">
+
+    <ImageView
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:padding="16dp"
+        android:src="@drawable/ic_clear_white_24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:includeFontPadding="false"
+        android:text="Choose photo or video"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/toolbar_text_color" />
+
+    <TextView
+        android:id="@+id/btn_next"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:padding="16dp"
+        android:text="Next"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/toolbar_text_color" />
+</RelativeLayout>
