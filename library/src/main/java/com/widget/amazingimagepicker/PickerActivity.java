@@ -61,6 +61,12 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private OffsetChangeListener offsetChangeListener;
     private PhotoViewAttacher mAttacher;
 
+    public static void start(Activity activity, int topbarId, int requestCode) {
+        Intent intent = new Intent(activity, PickerActivity.class);
+        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     @Override
     public void onCreate(Bundle savedStateInstance) {
         super.onCreate(savedStateInstance);
@@ -94,6 +100,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         ViewCompat.setElevation(appBarLayout, 0);
         imageContent = (ImageView) findViewById(R.id.image_content);
         videoContentContainer = (RelativeLayout) findViewById(R.id.video_content_container);
+        videoContent = new TextureVideoView(this);
         invisibleToolbar = (Toolbar) findViewById(R.id.invisible_toolbar);
         headerTouchDelegate = (HeaderTouchDelegate) findViewById(R.id.header_touch_delegate);
 
@@ -148,9 +155,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                 break;
             case VIDEO:
                 videoContentContainer.removeAllViews();
-                if (videoContent != null) {
-                    videoContent.release();
-                }
+                videoContent.release();
                 videoContent = new TextureVideoView(this);
                 videoContent.setListener(new TextureVideoView.MediaPlayerListener() {
                     @Override
@@ -268,7 +273,9 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         }
 
         public boolean onUp(MotionEvent event) {
-            setExpanded(offsetChangeListener.getLastNotNullOffsetChange() > 0);
+            if (offsetChangeListener.getLastNotNullOffsetChange() != 0) {
+                setExpanded(offsetChangeListener.getLastNotNullOffsetChange() > 0);
+            }
             return true;
         }
 

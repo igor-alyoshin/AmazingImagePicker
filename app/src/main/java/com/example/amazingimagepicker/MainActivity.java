@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.widget.amazingimagepicker.PickerActivity;
 
+import io.fabric.sdk.android.Fabric;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,15 +27,14 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("all")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         findViewById(R.id.start_picker).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PickerActivity.class);
-                intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, R.layout.topbar);
-                startActivityForResult(intent, REQUEST_CODE);
+                PickerActivity.start(MainActivity.this, R.layout.topbar, REQUEST_CODE);
             }
         });
     }

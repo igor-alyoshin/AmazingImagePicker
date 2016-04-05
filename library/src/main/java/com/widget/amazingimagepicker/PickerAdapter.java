@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -92,7 +93,7 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         View itemView = holder.itemView;
         LineItem item = itemList.get(position);
         final Context context = holder.itemView.getContext();
@@ -106,6 +107,11 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             lp.headerEndMarginIsAuto = true;
             lp.headerStartMarginIsAuto = true;
             headerViewHolder.title.setText(item.title);
+            headerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            });
         } else {
             GridItemViewHolder gridItemViewHolder = (GridItemViewHolder) holder;
 

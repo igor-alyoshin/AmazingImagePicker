@@ -4,5 +4,5 @@
     <color name="header_background_color">#141214</color>
     <color name="header_text_color">#cccccc</color>
     <color name="toolbar_text_color">#FFFFFF</color>
-    <color name="item_selected_overlay_color">#77770000</color>
+    <color name="item_selected_overlay_color">#77DD0000</color>
 </resources>
