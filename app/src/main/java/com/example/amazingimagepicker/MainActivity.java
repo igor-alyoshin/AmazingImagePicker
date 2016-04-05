@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(this, "RESULT_OK: " + data.getStringExtra(PickerActivity.EXTRA_RESULT), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "RESULT_OK: " + data.getData(), Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "RESULT_CANCELED", Toast.LENGTH_LONG).show();
             }

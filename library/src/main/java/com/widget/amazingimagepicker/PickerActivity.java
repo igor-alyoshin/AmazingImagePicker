@@ -42,7 +42,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PickerActivity extends AppCompatActivity implements ScrollFeedbackRecyclerView.Callbacks {
 
-    public final static String EXTRA_RESULT = "EXTRA_RESULT";
     public final static String EXTRA_TOPBAR_ID = "EXTRA_TOPBAR_ID";
     private final static int NUM_COLUMNS = 4;
 
@@ -260,7 +259,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
     private void sendResult() {
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_RESULT, selectedUri.toString());
+        intent.setData(selectedUri);
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
