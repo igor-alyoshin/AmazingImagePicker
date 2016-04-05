@@ -21,7 +21,6 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity {
 
     private static int REQUEST_CODE = 111;
-    private MediaScannerConnection mediaScanner;
 
     @Override
     @SuppressWarnings("all")
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.start_picker).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PickerActivity.start(MainActivity.this, R.layout.topbar, REQUEST_CODE);
+                PickerActivity.pickImages(MainActivity.this, R.layout.topbar, REQUEST_CODE);
             }
         });
     }

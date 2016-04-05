@@ -42,7 +42,9 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PickerActivity extends AppCompatActivity implements ScrollFeedbackRecyclerView.Callbacks {
 
-    public final static String EXTRA_TOPBAR_ID = "EXTRA_TOPBAR_ID";
+    private final static String EXTRA_TOPBAR_ID = "EXTRA_TOPBAR_ID";
+    private final static String EXTRA_IMAGES= "EXTRA_IMAGES";
+    private final static String EXTRA_VIDEOS= "EXTRA_VIDEOS";
     private final static int NUM_COLUMNS = 4;
 
     private AppBarLayout appBarLayout;
@@ -60,9 +62,25 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private OffsetChangeListener offsetChangeListener;
     private PhotoViewAttacher mAttacher;
 
-    public static void start(Activity activity, int topbarId, int requestCode) {
+    public static void pickImages(Activity activity, int topbarId, int requestCode) {
         Intent intent = new Intent(activity, PickerActivity.class);
         intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
+        intent.putExtra(PickerActivity.EXTRA_IMAGES, true);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void pickVideos(Activity activity, int topbarId, int requestCode, boolean onlyImages) {
+        Intent intent = new Intent(activity, PickerActivity.class);
+        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
+        intent.putExtra(PickerActivity.EXTRA_VIDEOS, true);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void pickAll(Activity activity, int topbarId, int requestCode) {
+        Intent intent = new Intent(activity, PickerActivity.class);
+        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
+        intent.putExtra(PickerActivity.EXTRA_VIDEOS, true);
+        intent.putExtra(PickerActivity.EXTRA_IMAGES, true);
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -106,11 +124,15 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LayoutManager(this));
         mRecyclerView.addItemDecoration(new ItemDecorationAlbumColumns<>(getResources().getDimensionPixelOffset(R.dimen.spacing), NUM_COLUMNS, PickerAdapter.class));
-        List<Content> videos = ContentStoreAccessor.getAllVideos(this);
-        List<Content> images = ContentStoreAccessor.getAllImages(this);
         List<Content> all = new ArrayList<>();
-        all.addAll(videos);
-        all.addAll(images);
+        if (getIntent().hasExtra(EXTRA_VIDEOS)) {
+            List<Content> videos = ContentStoreAccessor.getAllVideos(this);
+            all.addAll(videos);
+        }
+        if (getIntent().hasExtra(EXTRA_IMAGES)) {
+            List<Content> images = ContentStoreAccessor.getAllImages(this);
+            all.addAll(images);
+        }
         pickerAdapter = new PickerAdapter(all, NUM_COLUMNS, new PickerAdapter.OnContentClickListener() {
             @Override
             public void onClick(Content content) {
