@@ -1,25 +1,34 @@
 package com.widget.amazingimagepicker;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -42,9 +51,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PickerActivity extends AppCompatActivity implements ScrollFeedbackRecyclerView.Callbacks {
 
-    private final static String EXTRA_TOPBAR_ID = "EXTRA_TOPBAR_ID";
-    private final static String EXTRA_IMAGES= "EXTRA_IMAGES";
-    private final static String EXTRA_VIDEOS= "EXTRA_VIDEOS";
     private final static int NUM_COLUMNS = 4;
 
     private AppBarLayout appBarLayout;
@@ -54,64 +60,24 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private Toolbar invisibleToolbar;
     private HeaderTouchDelegate headerTouchDelegate;
     private RecyclerView mRecyclerView;
-    private View btnClose;
-    private View btnNext;
     private Uri selectedUri = null;
+
+    private String mToolbarTitle;
+    private String mNextTitle;
+    private int mToolbarColor;
+    private int mStatusBarColor;
+    private int mToolbarTextColor;
 
     private PickerAdapter pickerAdapter;
     private OffsetChangeListener offsetChangeListener;
     private PhotoViewAttacher mAttacher;
-
-    public static void pickImages(Activity activity, int topbarId, int requestCode) {
-        Intent intent = new Intent(activity, PickerActivity.class);
-        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
-        intent.putExtra(PickerActivity.EXTRA_IMAGES, true);
-        activity.startActivityForResult(intent, requestCode);
-    }
-
-    public static void pickVideos(Activity activity, int topbarId, int requestCode, boolean onlyImages) {
-        Intent intent = new Intent(activity, PickerActivity.class);
-        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
-        intent.putExtra(PickerActivity.EXTRA_VIDEOS, true);
-        activity.startActivityForResult(intent, requestCode);
-    }
-
-    public static void pickAll(Activity activity, int topbarId, int requestCode) {
-        Intent intent = new Intent(activity, PickerActivity.class);
-        intent.putExtra(PickerActivity.EXTRA_TOPBAR_ID, topbarId);
-        intent.putExtra(PickerActivity.EXTRA_VIDEOS, true);
-        intent.putExtra(PickerActivity.EXTRA_IMAGES, true);
-        activity.startActivityForResult(intent, requestCode);
-    }
 
     @Override
     public void onCreate(Bundle savedStateInstance) {
         super.onCreate(savedStateInstance);
         setContentView(R.layout.activity_picker);
 
-        int topbarId = getIntent().getIntExtra(EXTRA_TOPBAR_ID, 0);
-        if (topbarId > 0) {
-            LayoutInflater.from(this).inflate(topbarId, (ViewGroup) findViewById(R.id.topbar_container), true);
-        }
-
-        btnClose = findViewById(R.id.btn_close);
-        if (btnClose != null) {
-            btnClose.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
-        }
-        btnNext = findViewById(R.id.btn_next);
-        if (btnNext != null) {
-            btnNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sendResult();
-                }
-            });
-        }
+        setupViews(getIntent());
 
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         ViewCompat.setElevation(appBarLayout, 0);
@@ -125,27 +91,18 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         mRecyclerView.setLayoutManager(new LayoutManager(this));
         mRecyclerView.addItemDecoration(new ItemDecorationAlbumColumns<>(getResources().getDimensionPixelOffset(R.dimen.spacing), NUM_COLUMNS, PickerAdapter.class));
         List<Content> all = new ArrayList<>();
-        if (getIntent().hasExtra(EXTRA_VIDEOS)) {
+        if (getIntent().hasExtra(Picker.Options.EXTRA_VIDEOS)) {
             List<Content> videos = ContentStoreAccessor.getAllVideos(this);
             all.addAll(videos);
         }
-        if (getIntent().hasExtra(EXTRA_IMAGES)) {
+        if (getIntent().hasExtra(Picker.Options.EXTRA_IMAGES)) {
             List<Content> images = ContentStoreAccessor.getAllImages(this);
             all.addAll(images);
         }
         pickerAdapter = new PickerAdapter(all, NUM_COLUMNS, new PickerAdapter.OnContentClickListener() {
             @Override
             public void onClick(Content content) {
-                if (btnNext == null && content.getContentUri().equals(selectedUri)) {
-                    mRecyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendResult();
-                        }
-                    });
-                } else {
-                    loadContent(content);
-                }
+                loadContent(content);
             }
         });
         mRecyclerView.setAdapter(pickerAdapter);
@@ -167,6 +124,104 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         headerTouchDelegate.setOnTouchListener(mAttacher, imageContent);
         headerTouchDelegate.setOnGestureDetectorListener(gestureListener);
         headerTouchDelegate.setCallbacks(this);
+    }
+
+    private void setupViews(@NonNull Intent intent) {
+        mStatusBarColor = intent.getIntExtra(Picker.Options.EXTRA_STATUS_BAR_COLOR, ContextCompat.getColor(this, android.R.color.black));
+        mToolbarColor = intent.getIntExtra(Picker.Options.EXTRA_TOOL_BAR_COLOR, ContextCompat.getColor(this, android.R.color.black));
+        mToolbarTextColor = intent.getIntExtra(Picker.Options.EXTRA_PICKER_TITLE_COLOR_TOOLBAR, ContextCompat.getColor(this, android.R.color.white));
+        mToolbarTitle = intent.getStringExtra(Picker.Options.EXTRA_PICKER_TITLE_TEXT_TOOLBAR);
+        mNextTitle = intent.getStringExtra(Picker.Options.EXTRA_PICKER_NEXT_TEXT_TOOLBAR);
+
+        setupAppBar();
+    }
+
+    /**
+     * Configures and styles both status bar and toolbar.
+     */
+    private void setupAppBar() {
+        setStatusBarColor(mStatusBarColor);
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar.setBackgroundColor(mToolbarColor);
+        toolbar.setTitleTextColor(mToolbarTextColor);
+        toolbar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                View menuNext = findViewById(R.id.menu_next);
+                if (menuNext != null) {
+                    if (menuNext instanceof TextView) {
+                        TextView tv = (TextView) menuNext;
+                        tv.setAllCaps(false);
+                        tv.setText(mNextTitle);
+                        tv.setTextColor(mToolbarTextColor);
+                    }
+                    if (Build.VERSION.SDK_INT < 16) {
+                        toolbar.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    } else {
+                        toolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                }
+            }
+        });
+
+        final TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        toolbarTitle.setTextColor(mToolbarTextColor);
+        toolbarTitle.setText(mToolbarTitle);
+
+        // Color buttons inside the Toolbar
+        Drawable stateButtonDrawable = ContextCompat.getDrawable(this, R.drawable.ic_clear_white_24dp).mutate();
+        stateButtonDrawable.setColorFilter(mToolbarTextColor, PorterDuff.Mode.SRC_ATOP);
+        toolbar.setNavigationIcon(stateButtonDrawable);
+
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+    }
+
+    /**
+     * Sets status-bar color for L devices.
+     *
+     * @param color - status-bar color
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setStatusBarColor(@ColorInt int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (getWindow() != null) {
+                getWindow().setStatusBarColor(color);
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.picker, menu);
+
+        MenuItem next = menu.findItem(R.id.menu_next);
+        next.setTitle(mNextTitle);
+
+        Drawable defaultIcon = next.getIcon();
+        if (defaultIcon != null && TextUtils.isEmpty(mNextTitle)) {
+            defaultIcon.mutate();
+            defaultIcon.setColorFilter(mToolbarTextColor, PorterDuff.Mode.SRC_ATOP);
+            next.setIcon(defaultIcon);
+        } else if (defaultIcon != null) {
+            next.setIcon(null);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_next) {
+            sendResult();
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void loadContent(final Content content) {

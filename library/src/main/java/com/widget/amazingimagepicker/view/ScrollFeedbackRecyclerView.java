@@ -3,7 +3,6 @@ package com.widget.amazingimagepicker.view;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.widget.amazingimagepicker.PickerActivity;
