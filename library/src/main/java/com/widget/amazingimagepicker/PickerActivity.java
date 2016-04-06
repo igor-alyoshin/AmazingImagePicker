@@ -171,7 +171,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         toolbarTitle.setText(mToolbarTitle);
 
         // Color buttons inside the Toolbar
-        Drawable stateButtonDrawable = ContextCompat.getDrawable(this, R.drawable.ic_clear_white_24dp).mutate();
+        Drawable stateButtonDrawable = ContextCompat.getDrawable(this, R.drawable.picker_clear_white_24dp).mutate();
         stateButtonDrawable.setColorFilter(mToolbarTextColor, PorterDuff.Mode.SRC_ATOP);
         toolbar.setNavigationIcon(stateButtonDrawable);
 

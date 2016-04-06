@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 
 public class Picker {
 
-    public static int REQUEST_CODE = 1212;
+    public final static int REQUEST_CODE = 1213;
 
     private static final String EXTRA_PREFIX = BuildConfig.APPLICATION_ID;
 
