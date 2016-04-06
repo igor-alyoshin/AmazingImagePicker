@@ -337,9 +337,11 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
     private void sendResult() {
         Intent intent = new Intent();
-        intent.setData(selectedUri);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
+        if (selectedUri != null) {
+            intent.setData(selectedUri);
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+        }
     }
 
     public class GestureListener extends GestureDetector.SimpleOnGestureListener implements GestureDetector.OnGestureListener {
