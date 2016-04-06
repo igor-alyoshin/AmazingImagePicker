@@ -156,6 +156,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                         tv.setAllCaps(false);
                         tv.setText(mNextTitle);
                         tv.setTextColor(mToolbarTextColor);
+                        tv.setMinWidth(tv.getWidth());
                     }
                     if (Build.VERSION.SDK_INT < 16) {
                         toolbar.getViewTreeObserver().removeGlobalOnLayoutListener(this);
