@@ -10,7 +10,7 @@
     android:textSize="16sp"
     tools:text="Header Item"
     android:textColor="@color/header_text_color"
-    app:slm_headerDisplay="inline|sticky"
+    app:slm_headerDisplay="inline"
     app:slm_isHeader="true"
     app:slm_section_headerMarginStart="56dip"
     android:background="@color/header_background_color"

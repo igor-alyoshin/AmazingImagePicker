@@ -7,10 +7,11 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.widget.amazingimagepicker.PickerActivity;
 
-public class HeaderTouchDelegate extends SquareRelativeLayout {
+public class HeaderTouchDelegate extends RelativeLayout {
 
     private GestureDetectorCompat mDetector;
     private OnTouchListener onTouchListener;

@@ -41,6 +41,7 @@ import com.widget.amazingimagepicker.utils.ContentStoreAccessor;
 import com.widget.amazingimagepicker.utils.ItemDecorationAlbumColumns;
 import com.widget.amazingimagepicker.view.HeaderTouchDelegate;
 import com.widget.amazingimagepicker.view.ScrollFeedbackRecyclerView;
+import com.widget.amazingimagepicker.view.SquareRelativeLayout;
 import com.widget.amazingimagepicker.view.TextureVideoView;
 import com.widget.amazingimagepicker.view.appbarlayout_23_2_1.AppBarLayout;
 
@@ -55,13 +56,16 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
     private AppBarLayout appBarLayout;
     private ImageView imageContent;
+    private SquareRelativeLayout contentContainer;
     private RelativeLayout videoContentContainer;
     private TextureVideoView videoContent;
     private Toolbar invisibleToolbar;
     private HeaderTouchDelegate headerTouchDelegate;
     private RecyclerView mRecyclerView;
-    private Uri selectedUri = null;
+    private View flipper;
+    private View flipperIcon;
 
+    private Uri selectedUri = null;
     private String mToolbarTitle;
     private String mNextTitle;
     private int mToolbarColor;
@@ -82,10 +86,19 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         ViewCompat.setElevation(appBarLayout, 0);
         imageContent = (ImageView) findViewById(R.id.image_content);
+        contentContainer = (SquareRelativeLayout) findViewById(R.id.content_container);
         videoContentContainer = (RelativeLayout) findViewById(R.id.video_content_container);
         videoContent = new TextureVideoView(this);
         invisibleToolbar = (Toolbar) findViewById(R.id.invisible_toolbar);
         headerTouchDelegate = (HeaderTouchDelegate) findViewById(R.id.header_touch_delegate);
+        flipperIcon = findViewById(R.id.flipper_icon);
+        flipper = findViewById(R.id.flipper);
+        flipper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setExpanded(isAppBarCollapsed());
+            }
+        });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LayoutManager(this));
@@ -328,10 +341,10 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
     private void updateTouchDelegate() {
         if (imageContent.getVisibility() == View.VISIBLE) {
-            headerTouchDelegate.setBottom(appBarLayout.getBottom());
+            headerTouchDelegate.setBottom(appBarLayout.getBottom() - invisibleToolbar.getHeight());
         }
         if (videoContent != null && videoContent.getVisibility() == View.VISIBLE) {
-            headerTouchDelegate.setBottom(appBarLayout.getBottom());
+            headerTouchDelegate.setBottom(appBarLayout.getBottom() - invisibleToolbar.getHeight());
         }
     }
 
@@ -423,6 +436,8 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                 lastNotNullOffsetChange = verticalOffset - offset;
             }
             offset = verticalOffset;
+            int degree = - 180 * offset / contentContainer.getHeight();
+            flipperIcon.setRotationX(degree);
             updateTouchDelegate();
         }
     }

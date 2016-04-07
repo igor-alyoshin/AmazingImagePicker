@@ -60,24 +60,43 @@
                         android:layout_height="?attr/actionBarSize"
                         app:layout_collapseMode="pin"/>
 
-                    <com.widget.amazingimagepicker.view.SquareRelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/header_background_color"
-                        android:fitsSystemWindows="true"
-                        app:layout_collapseMode="pin">
-
-                        <RelativeLayout
-                            android:id="@+id/video_content_container"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                        </RelativeLayout>
-
-                        <uk.co.senab.photoview.PhotoView
-                            android:id="@+id/image_content"
+                        android:orientation="vertical">
+                        <com.widget.amazingimagepicker.view.SquareRelativeLayout
+                            android:id="@+id/content_container"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
-                    </com.widget.amazingimagepicker.view.SquareRelativeLayout>
+                            android:layout_height="wrap_content"
+                            android:background="@color/grid_item_background_color"
+                            android:fitsSystemWindows="true"
+                            app:layout_collapseMode="pin">
+
+                            <RelativeLayout
+                                android:id="@+id/video_content_container"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                            </RelativeLayout>
+
+                            <uk.co.senab.photoview.PhotoView
+                                android:id="@+id/image_content"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"/>
+                        </com.widget.amazingimagepicker.view.SquareRelativeLayout>
+                        <RelativeLayout
+                            android:id="@+id/flipper"
+                            android:layout_width="match_parent"
+                            android:background="@color/flipper_background_color"
+                            android:layout_height="?attr/actionBarSize"
+                            android:clickable="true">
+                            <ImageView
+                                android:id="@+id/flipper_icon"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/picker_flipper_arrow"/>
+                        </RelativeLayout>
+                    </LinearLayout>
                 </android.support.design.widget.CollapsingToolbarLayout>
             </com.widget.amazingimagepicker.view.appbarlayout_23_2_1.AppBarLayout>
         </android.support.design.widget.CoordinatorLayout>
