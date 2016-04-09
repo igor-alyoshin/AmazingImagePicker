@@ -56,7 +56,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class PickerActivity extends AppCompatActivity implements ScrollFeedbackRecyclerView.Callbacks {
 
     private final static int NUM_COLUMNS = 4;
-    private final static int STORAGE_PERMISSION_RC = 666;
+    private final static int STORAGE_PERMISSION_RC = 0;
 
     private AppBarLayout appBarLayout;
     private ImageView imageContent;
