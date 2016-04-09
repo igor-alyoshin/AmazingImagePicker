@@ -46,13 +46,17 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Content selectedItem;
 
     public PickerAdapter(List<Content> itemList, int numColumns, OnContentClickListener onUriClick) {
+        this.numColumns = numColumns;
+        this.onUriClick = onUriClick;
+        setData(itemList);
+    }
+
+    public void setData(List<Content> itemList) {
         Bucket lastBucket = null;
         int sectionManager = -1;
         int headerCount = 0;
         int sectionFirstPosition = 0;
-        this.numColumns = numColumns;
         this.contentList = itemList;
-        this.onUriClick = onUriClick;
         Collections.sort(itemList, new Comparator<Content>() {
             @Override
             public int compare(Content lhs, Content rhs) {

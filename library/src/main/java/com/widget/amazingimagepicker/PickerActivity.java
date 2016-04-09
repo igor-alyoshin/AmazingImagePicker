@@ -1,8 +1,10 @@
 package com.widget.amazingimagepicker;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
@@ -12,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
@@ -53,6 +56,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class PickerActivity extends AppCompatActivity implements ScrollFeedbackRecyclerView.Callbacks {
 
     private final static int NUM_COLUMNS = 4;
+    private final static int STORAGE_PERMISSION_RC = 666;
 
     private AppBarLayout appBarLayout;
     private ImageView imageContent;
@@ -103,30 +107,13 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LayoutManager(this));
         mRecyclerView.addItemDecoration(new ItemDecorationAlbumColumns<>(getResources().getDimensionPixelOffset(R.dimen.spacing), NUM_COLUMNS, PickerAdapter.class));
-        List<Content> all = new ArrayList<>();
-        if (getIntent().hasExtra(Picker.Options.EXTRA_VIDEOS)) {
-            List<Content> videos = ContentStoreAccessor.getAllVideos(this);
-            all.addAll(videos);
-        }
-        if (getIntent().hasExtra(Picker.Options.EXTRA_IMAGES)) {
-            List<Content> images = ContentStoreAccessor.getAllImages(this);
-            all.addAll(images);
-        }
-        pickerAdapter = new PickerAdapter(all, NUM_COLUMNS, new PickerAdapter.OnContentClickListener() {
+        pickerAdapter = new PickerAdapter(new ArrayList<Content>(), NUM_COLUMNS, new PickerAdapter.OnContentClickListener() {
             @Override
             public void onClick(Content content) {
                 loadContent(content);
             }
         });
         mRecyclerView.setAdapter(pickerAdapter);
-        mRecyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                if (pickerAdapter.getItemCount() > 0) {
-                    loadContent(pickerAdapter.getItem(0));
-                }
-            }
-        });
 
         offsetChangeListener = new OffsetChangeListener();
         appBarLayout.addOnOffsetChangedListener(offsetChangeListener);
@@ -137,6 +124,47 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         headerTouchDelegate.setOnTouchListener(mAttacher, imageContent);
         headerTouchDelegate.setOnGestureDetectorListener(gestureListener);
         headerTouchDelegate.setCallbacks(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_RC);
+        } else {
+            loadContentFromSDCard();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_RC) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                loadContentFromSDCard();
+            } else {
+                finish();
+            }
+        }
+    }
+
+    private void loadContentFromSDCard() {
+        List<Content> all = new ArrayList<>();
+        if (getIntent().hasExtra(Picker.Options.EXTRA_VIDEOS)) {
+            List<Content> videos = ContentStoreAccessor.getAllVideos(this);
+            all.addAll(videos);
+        }
+        if (getIntent().hasExtra(Picker.Options.EXTRA_IMAGES)) {
+            List<Content> images = ContentStoreAccessor.getAllImages(this);
+            all.addAll(images);
+        }
+        pickerAdapter.setData(all);
+        pickerAdapter.notifyDataSetChanged();
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (pickerAdapter.getItemCount() > 0) {
+                    loadContent(pickerAdapter.getItem(0));
+                }
+            }
+        });
     }
 
     private void setupViews(@NonNull Intent intent) {
