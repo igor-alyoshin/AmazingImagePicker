@@ -68,6 +68,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private RecyclerView mRecyclerView;
     private View flipper;
     private View flipperIcon;
+    private View emptyLayout;
 
     private Uri selectedUri = null;
     private String mToolbarTitle;
@@ -103,6 +104,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                 setExpanded(isAppBarCollapsed());
             }
         });
+        emptyLayout = findViewById(R.id.empty_layout);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LayoutManager(this));
@@ -155,6 +157,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
             List<Content> images = ContentStoreAccessor.getAllImages(this);
             all.addAll(images);
         }
+        emptyLayout.setVisibility(all.size() == 0 ? View.VISIBLE : View.GONE);
         pickerAdapter.setData(all);
         pickerAdapter.notifyDataSetChanged();
         mRecyclerView.post(new Runnable() {

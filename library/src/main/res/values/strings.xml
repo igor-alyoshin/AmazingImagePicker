@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">AmazingImagePicker</string>
     <string name="right_text">OK</string>
+    <string name="empty_text">You have no photos</string>
 </resources>

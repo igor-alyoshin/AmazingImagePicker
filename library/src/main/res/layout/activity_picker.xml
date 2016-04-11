@@ -82,6 +82,28 @@
                                 android:id="@+id/image_content"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"/>
+
+                            <LinearLayout
+                                android:id="@+id/empty_layout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:alpha="0.4"
+                                android:orientation="vertical">
+                                <ImageView
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="center_horizontal"
+                                    android:src="@drawable/empty"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="@string/empty_text"
+                                    android:textAppearance="?android:attr/textAppearanceLarge"
+                                    android:paddingTop="@dimen/empty_padding_top"
+                                    android:textColor="@color/toolbar_text_color"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
                         </com.widget.amazingimagepicker.view.SquareRelativeLayout>
                         <RelativeLayout
                             android:id="@+id/flipper"
