@@ -2,4 +2,5 @@
 <resources>
     <item name="btn_next" type="id"/>
     <item name="btn_close" type="id"/>
+    <item name="image_tag" type="id"/>
 </resources>

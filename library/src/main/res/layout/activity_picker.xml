@@ -30,7 +30,7 @@
         android:layout_below="@+id/toolbar"
         tools:visibility="gone">
 
-        <android.support.design.widget.CoordinatorLayout
+        <com.widget.amazingimagepicker.view.PickerCoordinatorLayout
             android:id="@+id/coordinator_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -121,7 +121,7 @@
                     </LinearLayout>
                 </android.support.design.widget.CollapsingToolbarLayout>
             </com.widget.amazingimagepicker.view.appbarlayout_23_2_1.AppBarLayout>
-        </android.support.design.widget.CoordinatorLayout>
+        </com.widget.amazingimagepicker.view.PickerCoordinatorLayout>
 
         <com.widget.amazingimagepicker.view.HeaderTouchDelegate
             android:id="@+id/header_touch_delegate"

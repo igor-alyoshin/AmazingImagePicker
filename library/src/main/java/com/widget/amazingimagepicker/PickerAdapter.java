@@ -18,7 +18,10 @@ import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.model.ModelLoader;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.widget.amazingimagepicker.holder.GridItemViewHolder;
 import com.widget.amazingimagepicker.holder.HeaderViewHolder;
 import com.widget.amazingimagepicker.model.Bucket;
@@ -117,7 +120,7 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             });
         } else {
-            GridItemViewHolder gridItemViewHolder = (GridItemViewHolder) holder;
+            final GridItemViewHolder gridItemViewHolder = (GridItemViewHolder) holder;
 
             if (selectedItem == null && position == 1) {
                 selectedItem = item.content;
@@ -132,9 +135,25 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             final Uri imageURI = content.getImageUri();
             switch (content.getType()) {
                 case IMAGE:
-                    Glide.with(context)
-                            .load(imageURI)
-                            .into(gridItemViewHolder.image);
+                    final Object loadedUri = gridItemViewHolder.image.getTag(R.id.image_tag);
+                    if (loadedUri == null || !loadedUri.equals(imageURI)) {
+                        Glide.with(context)
+                                .load(imageURI)
+                                .listener(new RequestListener<Uri, GlideDrawable>() {
+                                    @Override
+                                    public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                        gridItemViewHolder.image.setTag(R.id.image_tag, null);
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                        gridItemViewHolder.image.setTag(R.id.image_tag, model);
+                                        return false;
+                                    }
+                                })
+                                .into(gridItemViewHolder.image);
+                    }
                     gridItemViewHolder.duration.setText(null);
                     gridItemViewHolder.itemView.setOnClickListener(new OnGridClickListener(content));
                     break;

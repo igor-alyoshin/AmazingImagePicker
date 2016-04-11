@@ -43,6 +43,7 @@ import com.widget.amazingimagepicker.superslim.LayoutManager;
 import com.widget.amazingimagepicker.utils.ContentStoreAccessor;
 import com.widget.amazingimagepicker.utils.ItemDecorationAlbumColumns;
 import com.widget.amazingimagepicker.view.HeaderTouchDelegate;
+import com.widget.amazingimagepicker.view.PickerCoordinatorLayout;
 import com.widget.amazingimagepicker.view.ScrollFeedbackRecyclerView;
 import com.widget.amazingimagepicker.view.SquareRelativeLayout;
 import com.widget.amazingimagepicker.view.TextureVideoView;
@@ -59,6 +60,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private final static int STORAGE_PERMISSION_RC = 0;
 
     private AppBarLayout appBarLayout;
+    private PickerCoordinatorLayout coordinatorLayout;
     private ImageView imageContent;
     private SquareRelativeLayout contentContainer;
     private RelativeLayout videoContentContainer;
@@ -88,6 +90,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
         setupViews(getIntent());
 
+        coordinatorLayout = (PickerCoordinatorLayout) findViewById(R.id.coordinator_layout);
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         ViewCompat.setElevation(appBarLayout, 0);
         imageContent = (ImageView) findViewById(R.id.image_content);
@@ -157,6 +160,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
             List<Content> images = ContentStoreAccessor.getAllImages(this);
             all.addAll(images);
         }
+        coordinatorLayout.setEnabled(all.size() > 0);
         emptyLayout.setVisibility(all.size() == 0 ? View.VISIBLE : View.GONE);
         pickerAdapter.setData(all);
         pickerAdapter.notifyDataSetChanged();
