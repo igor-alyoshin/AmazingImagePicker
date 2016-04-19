@@ -6,10 +6,10 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -54,11 +54,45 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         setData(itemList);
     }
 
+    public static List<Content> getHeaderList(List<Content> itemList) {
+        List<Content> headerList = new ArrayList<>();
+        Bucket lastBucket = null;
+        int sectionManager = -1;
+        Collections.sort(itemList, new Comparator<Content>() {
+            @Override
+            public int compare(Content lhs, Content rhs) {
+                long lValue = Long.valueOf(lhs.getBucket().getId());
+                long rValue = Long.valueOf(rhs.getBucket().getId());
+                return lValue > rValue ? 1 : lValue == rValue ? lhs.getDate() < rhs.getDate() ? 1 : lhs.getDate() == rhs.getDate() ? 0 : -1 : -1;
+            }
+        });
+        for (int i = 0; i < itemList.size(); i++) {
+            Content item = itemList.get(i);
+            if (!item.getBucket().equals(lastBucket)) {
+                sectionManager = (sectionManager + 1) % 2;
+                lastBucket = item.getBucket();
+                headerList.add(item);
+            }
+        }
+        return headerList;
+    }
+
+    public static List<Content> filter(String header, List<Content> items) {
+        List<Content> result = new ArrayList<>();
+        for (Content item : items) {
+            if (TextUtils.equals(item.getBucket().getName(), header)) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
     public void setData(List<Content> itemList) {
         Bucket lastBucket = null;
         int sectionManager = -1;
         int headerCount = 0;
         int sectionFirstPosition = 0;
+        this.itemList.clear();
         this.contentList = itemList;
         Collections.sort(itemList, new Comparator<Content>() {
             @Override
@@ -288,6 +322,7 @@ public class PickerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         int sectionFirstPosition) {
             this.isHeader = false;
             this.content = content;
+            this.title = content.getBucket().getName();
             this.sectionManager = sectionManager;
             this.sectionFirstPosition = sectionFirstPosition;
         }

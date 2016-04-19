@@ -38,6 +38,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.widget.amazingimagepicker.model.Content;
 import com.widget.amazingimagepicker.superslim.LayoutManager;
 import com.widget.amazingimagepicker.utils.ContentStoreAccessor;
@@ -162,16 +163,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         }
         coordinatorLayout.setEnabled(all.size() > 0);
         emptyLayout.setVisibility(all.size() == 0 ? View.VISIBLE : View.GONE);
-        pickerAdapter.setData(all);
-        pickerAdapter.notifyDataSetChanged();
-        mRecyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                if (pickerAdapter.getItemCount() > 0) {
-                    loadContent(pickerAdapter.getItem(0));
-                }
-            }
-        });
+        setupSpinner(all);
     }
 
     private void setupViews(@NonNull Intent intent) {
@@ -215,9 +207,9 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
             }
         });
 
-        final TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        toolbarTitle.setTextColor(mToolbarTextColor);
-        toolbarTitle.setText(mToolbarTitle);
+//        final TextView toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+//        toolbarTitle.setTextColor(mToolbarTextColor);
+//        toolbarTitle.setText(mToolbarTitle);
 
         // Color buttons inside the Toolbar
         Drawable stateButtonDrawable = ContextCompat.getDrawable(this, R.drawable.picker_clear_white_24dp).mutate();
@@ -229,6 +221,48 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
+    }
+
+    @SuppressWarnings("all")
+    private void setupSpinner(final List<Content> items) {
+        MaterialSpinner navigationSpinner = (MaterialSpinner) findViewById(R.id.spinner_nav);
+        final List<String> strings = new ArrayList<>();
+        for (Content item : PickerAdapter.getHeaderList(items)) {
+            strings.add(item.getBucket().getName());
+        }
+        if (!strings.isEmpty()) {
+            navigationSpinner.setItems(strings);
+        }
+        navigationSpinner.setVisibility(strings.isEmpty() ? View.GONE : View.VISIBLE);
+        navigationSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                pickerAdapter.setData(pickerAdapter.filter(strings.get(position), items));
+                pickerAdapter.notifyDataSetChanged();
+                selectFirstItem();
+            }
+        });
+        navigationSpinner.post(new Runnable() {
+            @Override
+            public void run() {
+                if (!strings.isEmpty()) {
+                    pickerAdapter.setData(PickerAdapter.filter(strings.get(0), items));
+                    pickerAdapter.notifyDataSetChanged();
+                }
+                selectFirstItem();
+            }
+        });
+    }
+
+    private void selectFirstItem() {
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (pickerAdapter.getItemCount() > 0) {
+                    loadContent(pickerAdapter.getItem(0));
+                }
+            }
+        });
     }
 
     /**
