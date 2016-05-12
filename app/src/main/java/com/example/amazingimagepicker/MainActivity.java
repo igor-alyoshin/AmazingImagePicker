@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                 options.setToolbarColor(ContextCompat.getColor(MainActivity.this, android.R.color.black));
                 options.setNextTitle("Next");
                 options.setToolbarTitle("Choose photo");
-                Picker.get().withOptions(options).pickImages(MainActivity.this);
+                Picker.get().withOptions(options).pickAll(MainActivity.this);
             }
         });
     }

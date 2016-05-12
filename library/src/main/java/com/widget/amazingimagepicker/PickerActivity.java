@@ -420,9 +420,20 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private void sendResult() {
         Intent intent = new Intent();
         if (selectedUri != null) {
+            if (videoContent != null && videoContent.isPlaying()) {
+                videoContent.pause();
+            }
             intent.setData(selectedUri);
             setResult(Activity.RESULT_OK, intent);
             finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (videoContent != null && videoContent.isPlaying()) {
+            videoContent.pause();
         }
     }
 
