@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -410,10 +411,14 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
 
     private void updateTouchDelegate() {
         if (imageContent.getVisibility() == View.VISIBLE) {
-            headerTouchDelegate.setBottom(appBarLayout.getBottom() - invisibleToolbar.getHeight());
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) headerTouchDelegate.getLayoutParams();
+            lp.height = appBarLayout.getBottom() - invisibleToolbar.getHeight();
+            headerTouchDelegate.setLayoutParams(lp);
         }
         if (videoContent != null && videoContent.getVisibility() == View.VISIBLE) {
-            headerTouchDelegate.setBottom(appBarLayout.getBottom() - invisibleToolbar.getHeight());
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) headerTouchDelegate.getLayoutParams();
+            lp.height = appBarLayout.getBottom() - invisibleToolbar.getHeight();
+            headerTouchDelegate.setLayoutParams(lp);
         }
     }
 
