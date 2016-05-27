@@ -5,13 +5,16 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -67,6 +70,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private SquareRelativeLayout contentContainer;
     private RelativeLayout videoContentContainer;
     private View play;
+    private ImageView thumb;
     private TextureVideoView videoContent;
     private Toolbar invisibleToolbar;
     private HeaderTouchDelegate headerTouchDelegate;
@@ -100,6 +104,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         contentContainer = (SquareRelativeLayout) findViewById(R.id.content_container);
         videoContentContainer = (RelativeLayout) findViewById(R.id.video_content_container);
         play = findViewById(R.id.play);
+        thumb = (ImageView) findViewById(R.id.thumb);
         videoContent = new TextureVideoView(this);
         invisibleToolbar = (Toolbar) findViewById(R.id.invisible_toolbar);
         headerTouchDelegate = (HeaderTouchDelegate) findViewById(R.id.header_touch_delegate);
@@ -360,14 +365,22 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                 play.setVisibility(View.GONE);
             }
         });
-        updateTouchDelegate();
 
+        Bitmap b = ThumbnailUtils.createVideoThumbnail(content.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);//fetchFrame(content.getContentUri().toString());
+        if (b != null) {
+            thumb.setImageBitmap(b);
+            thumb.setVisibility(View.VISIBLE);
+        } else {
+            thumb.setVisibility(View.GONE);
+        }
+        updateTouchDelegate();
     }
 
     private void loadImage(Uri uri) {
         selectedUri = uri;
         videoContent.stop();
         videoContent.setVisibility(View.INVISIBLE);
+        thumb.setVisibility(View.GONE);
         imageContent.setVisibility(View.VISIBLE);
         //final Drawable prevDrawable = imageContent.getDrawable() == null ? new StateListDrawable() : imageContent.getDrawable();
         Glide.with(PickerActivity.this)

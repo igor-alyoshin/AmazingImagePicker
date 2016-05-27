@@ -81,6 +81,15 @@
                                 android:layout_height="match_parent">
 
                                 <ImageView
+                                    android:id="@+id/thumb"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:scaleType="fitCenter"
+                                    android:visibility="gone"
+                                    android:src="@drawable/ic_play"/>
+
+                                <ImageView
                                     android:id="@+id/play"
                                     android:layout_width="50dp"
                                     android:layout_height="50dp"
