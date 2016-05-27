@@ -66,6 +66,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
     private ImageView imageContent;
     private SquareRelativeLayout contentContainer;
     private RelativeLayout videoContentContainer;
+    private View play;
     private TextureVideoView videoContent;
     private Toolbar invisibleToolbar;
     private HeaderTouchDelegate headerTouchDelegate;
@@ -98,6 +99,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         imageContent = (ImageView) findViewById(R.id.image_content);
         contentContainer = (SquareRelativeLayout) findViewById(R.id.content_container);
         videoContentContainer = (RelativeLayout) findViewById(R.id.video_content_container);
+        play = findViewById(R.id.play);
         videoContent = new TextureVideoView(this);
         invisibleToolbar = (Toolbar) findViewById(R.id.invisible_toolbar);
         headerTouchDelegate = (HeaderTouchDelegate) findViewById(R.id.header_touch_delegate);
@@ -314,7 +316,15 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                 loadImage(content.getContentUri());
                 break;
             case VIDEO:
-                videoContentContainer.removeAllViews();
+                int videoViewIndex = -1;
+                for (int i = 0; i < videoContentContainer.getChildCount(); i++) {
+                    if (videoContentContainer.getChildAt(i) instanceof TextureVideoView) {
+                        videoViewIndex = i;
+                    }
+                }
+                if (videoViewIndex >= 0) {
+                    videoContentContainer.removeViewAt(videoViewIndex);
+                }
                 videoContent.release();
                 videoContent = new TextureVideoView(this);
                 videoContent.setListener(new TextureVideoView.MediaPlayerListener() {
@@ -328,20 +338,28 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
                     }
                 });
                 videoContentContainer.addView(videoContent);
-                loadVideo(content.getContentUri());
+                loadVideo(content);
                 break;
         }
     }
 
-    private void loadVideo(Uri uri) {
-        selectedUri = uri;
+    private void loadVideo(Content content) {
+        selectedUri = content.getContentUri();
         imageContent.setVisibility(View.INVISIBLE);
         imageContent.setImageDrawable(new StateListDrawable());
         mAttacher.update();
 
         setExpanded(true);
-        videoContent.setDataSource(this, uri);
-        videoContent.play();
+        videoContent.setDataSource(this, content.getContentUri());
+        play.bringToFront();
+        play.setVisibility(View.VISIBLE);
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                videoContent.play();
+                play.setVisibility(View.GONE);
+            }
+        });
         updateTouchDelegate();
 
     }
@@ -427,6 +445,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         if (selectedUri != null) {
             if (videoContent != null && videoContent.isPlaying()) {
                 videoContent.pause();
+                play.setVisibility(View.VISIBLE);
             }
             intent.setData(selectedUri);
             setResult(Activity.RESULT_OK, intent);
@@ -439,6 +458,7 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
         super.onBackPressed();
         if (videoContent != null && videoContent.isPlaying()) {
             videoContent.pause();
+            play.setVisibility(View.VISIBLE);
         }
     }
 
@@ -486,8 +506,10 @@ public class PickerActivity extends AppCompatActivity implements ScrollFeedbackR
             if (videoContent.getVisibility() == View.VISIBLE) {
                 if (videoContent.isPlaying()) {
                     videoContent.pause();
+                    play.setVisibility(View.VISIBLE);
                 } else {
                     videoContent.play();
+                    play.setVisibility(View.GONE);
                 }
             }
             return false;
